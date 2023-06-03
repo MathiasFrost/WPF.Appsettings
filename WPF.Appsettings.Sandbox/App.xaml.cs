@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using WPF.Appsettings;
 
 namespace WPF.Appsettings.Sandbox;
 
