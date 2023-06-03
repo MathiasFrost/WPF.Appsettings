@@ -13,12 +13,10 @@ public partial class App : Application
     protected override void OnActivated(EventArgs e)
     {
         base.OnActivated(e);
-        Debug.WriteLine(Appsettings.Root);
-
-        Debug.WriteLine(Appsettings.Root.GetObject("Logging").GetObject("LogLevel").GetValue<string>("Default"));
-        foreach (var b in Appsettings.Root.GetArray("Array").Select(node => node!.GetValue<byte>()))
+        foreach (var (key, value) in Appsettings.Value)
         {
-            Debug.WriteLine(b);
-        }
+            Debug.WriteLine($"{key} {value}");  
+        }   
+        Debug.WriteLine(Appsettings.GetSection("Logging__LogLevel__Default").GetString());
     }
 }

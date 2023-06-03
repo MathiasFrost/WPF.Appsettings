@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -6,7 +7,12 @@ namespace WPF.Appsettings;
 
 public static class Appsettings
 {
-    public static readonly JsonObject Root = EmptyJsonObject();
+    public static readonly Dictionary<string, string> Value = new();
+
+    public static ConfigurationSection GetSection(string path)
+    {
+        return new ConfigurationSection(path);
+    }
 
     static Appsettings()
     {
@@ -14,20 +20,21 @@ public static class Appsettings
         if (assembly == null) return;
 
         string[] names = assembly.GetManifestResourceNames();
+        Dictionary<string, string> value = new Dictionary<string, string>();
 
-        JsonObject ParseJsonFile(string filename)
+        void AddJsonFile(string filename)
         {
             string? assemblyName = assembly.GetName().Name;
-            if (assemblyName == null) return EmptyJsonObject();
+            if (assemblyName == null) return;
 
             var name = names.FirstOrDefault(str => str == $"{assemblyName}.{filename}");
-            if (name == null) return EmptyJsonObject();
+            if (name == null) return;
 
             using var stream = assembly.GetManifestResourceStream(name);
-            if (stream == null) return EmptyJsonObject();
+            if (stream == null) return;
 
             var res = JsonSerializer.Deserialize<JsonObject>(stream);
-            return res ?? EmptyJsonObject();
+            res!.Flatten(String.Empty, value);
         }
 
         string? wpfEnv;
@@ -41,17 +48,13 @@ public static class Appsettings
             wpfEnv = null;
         }
 
-        Root = ParseJsonFile("appsettings.json");
-        var envJson = wpfEnv == null ? EmptyJsonObject() : ParseJsonFile($"appsettings.{wpfEnv}.json");
-        var localRootJson = ParseJsonFile("appsettings.local.json");
-        var localEnvJson = wpfEnv == null ? EmptyJsonObject() : ParseJsonFile($"appsettings.{wpfEnv}.local.json");
+        AddJsonFile("appsettings.json");
+        if (wpfEnv != null) AddJsonFile($"appsettings.{wpfEnv}.json");
+        AddJsonFile("appsettings.local.json");
+        if (wpfEnv != null) AddJsonFile($"appsettings.{wpfEnv}.local.json");
 
-        Root.Merge(envJson);
-        Root.Merge(localRootJson);
-        Root.Merge(localEnvJson);
+        Value = value;
     }
-
-    private static JsonObject EmptyJsonObject() => JsonNode.Parse("{}")!.AsObject();
 
     private enum JsonType : byte
     {
@@ -92,97 +95,48 @@ public static class Appsettings
         }
     }
 
-    /// TODOC
-    private static JsonNode Copy(this JsonNode jsonNode) => JsonNode.Parse(jsonNode.ToJsonString())!;
-
-    /// Layer b on top of a
-    private static void Merge(this JsonNode? a, JsonNode? b)
+    private static bool GetString(this JsonNode? jsonNode, out string? res)
     {
-        var typeA = a.GetJsonType();
-        var typeB = b.GetJsonType();
-        switch (typeA)
+        res = jsonNode?.AsValue().GetValue<dynamic>().ToString();
+        return !String.IsNullOrWhiteSpace(res);
+    }
+
+    private static bool NoExisting(this Dictionary<string, string> dictionary, string key) => dictionary.All(pair => pair.Key != key);
+
+    private static void Flatten(this JsonNode? jsonNode, string parent, Dictionary<string, string> dictionary)
+    {
+        switch (jsonNode.GetJsonType())
         {
-            case JsonType.Object when typeB is JsonType.Object:
-                var objA = a!.AsObject();
-                var objB = b!.AsObject();
-                foreach (var (keyB, valB) in objB)
+            case JsonType.Value when parent != String.Empty && jsonNode.GetString(out string? s):
+                dictionary[parent] = s!;
+                break;
+            case JsonType.Object:
+                foreach (var (key, value) in jsonNode!.AsObject())
                 {
-                    var valA = objA[keyB];
-                    if (objA.ContainsKey(keyB))
+                    switch (value.GetJsonType())
                     {
-                        typeA = valA.GetJsonType();
-                        typeB = valB.GetJsonType();
-                        switch (typeA)
-                        {
-                            case JsonType.Value when objA.Remove(keyB): // If a is value, replace a with b
-                                objA.TryAdd(keyB, valB!.Copy());
-                                break;
-                            case JsonType.Object when typeB is JsonType.Object: // If both are objects merge them recursively
-                                valA.Merge(valB);
-                                break;
-                            case JsonType.Array when typeB is JsonType.Array: // If both are arrays merge them recursively
-                                valA.Merge(valB);
-                                break;
-                            default: // If types are different, just overwrite
-                                if (objA.Remove(keyB)) objA.TryAdd(keyB, valB!.Copy());
-                                break;
-                        }
-                    }
-                    else // If a does not have b, simply add b to a
-                    {
-                        objA.Add(keyB, valB!.Copy());
+                        case JsonType.Value when value.GetString(out string? s):
+                            dictionary[$"{parent}{key}"] = s!;
+                            break;
+                        case JsonType.Object:
+                            value!.AsObject().Flatten($"{parent}{key}__", dictionary);
+                            break;
+                        case JsonType.Array:
+                            var arr = value!.AsArray();
+                            for (var i = 0; i < arr.Count; i++) arr[i].Flatten($"{parent}{key}__{i}", dictionary);
+                            break;
+                        case JsonType.Null:
+                        default:
+                            break;
                     }
                 }
 
                 break;
-            case JsonType.Array when typeB is JsonType.Array:
-                var arrA = a!.AsArray();
-                var arrB = b!.AsArray();
-                var i = 0;
-                foreach (var elB in arrB)
-                {
-                    if (arrA.Count > i)
-                    {
-                        var elA = arrA[i];
-                        typeA = elA.GetJsonType();
-                        typeB = elB.GetJsonType();
-                        switch (typeA)
-                        {
-                            case JsonType.Value: // If a is value, replace a with b
-                                arrA[i] = elB!.Copy();
-                                break;
-                            case JsonType.Object when typeB is JsonType.Object: // If both are objects merge them recursively
-                                elA.Merge(elB);
-                                break;
-                            case JsonType.Array when typeB is JsonType.Array: // If both are arrays merge them recursively
-                                elA.Merge(elB);
-                                break;
-                            default: // If types are different, just overwrite
-                                if (elB != null) arrA[i] = elB.Copy();
-                                break;
-                        }
-                    }
-                    else // If a does not have b, simply add b to a
-                    {
-                        arrA.Add(elB!.Copy());
-                    }
-                }
-
+            case JsonType.Array:
+                break;
+            case JsonType.Null:
+            default:
                 break;
         }
     }
-
-    public static JsonNode GetPropertyValue(this JsonObject jsonObject, string key) =>
-        jsonObject.TryGetPropertyValue(key, out var value) && value != null
-            ? value
-            : throw new InvalidOperationException($"Could not find property {jsonObject.GetPath()}.{key}");
-
-    public static T GetValue<T>(this JsonObject jsonObject, string key) =>
-        jsonObject.GetPropertyValue(key).GetValue<T>();
-
-    public static JsonObject GetObject(this JsonObject jsonObject, string key) =>
-        jsonObject.GetPropertyValue(key).AsObject();
-
-    public static JsonArray GetArray(this JsonObject jsonObject, string key) =>
-        jsonObject.GetPropertyValue(key).AsArray();
 }
