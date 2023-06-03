@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF.Appsettings.Sandbox", "WPF.Appsettings.Sandbox\WPF.Appsettings.Sandbox.csproj", "{9991996C-4831-4124-B03E-AD097A82BEA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF.Appsettings", "WPF.Appsettings\WPF.Appsettings.csproj", "{4CB1F314-3B2D-4EA4-A79E-6EA2E0B6A31C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9991996C-4831-4124-B03E-AD097A82BEA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9991996C-4831-4124-B03E-AD097A82BEA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9991996C-4831-4124-B03E-AD097A82BEA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9991996C-4831-4124-B03E-AD097A82BEA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CB1F314-3B2D-4EA4-A79E-6EA2E0B6A31C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CB1F314-3B2D-4EA4-A79E-6EA2E0B6A31C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CB1F314-3B2D-4EA4-A79E-6EA2E0B6A31C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CB1F314-3B2D-4EA4-A79E-6EA2E0B6A31C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
