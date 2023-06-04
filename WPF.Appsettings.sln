@@ -1,7 +1,7 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF.Appsettings", "WPF.Appsettings\WPF.Appsettings.csproj", "{4CB1F314-3B2D-4EA4-A79E-6EA2E0B6A31C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF.Appsettings", "Source\WPF.Appsettings.csproj", "{4CB1F314-3B2D-4EA4-A79E-6EA2E0B6A31C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF.Appsettings.Sandbox", "WPF.Appsettings.Sandbox\WPF.Appsettings.Sandbox.csproj", "{9991996C-4831-4124-B03E-AD097A82BEA0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF.Appsettings.Sandbox", "Sandbox\WPF.Appsettings.Sandbox.csproj", "{9991996C-4831-4124-B03E-AD097A82BEA0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionFolder", "{614D736B-5384-4402-98C3-B4752B50CA87}"
 	ProjectSection(SolutionItems) = preProject

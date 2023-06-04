@@ -18,7 +18,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\WPF.Appsettings\WPF.Appsettings.csproj" />
+		<ProjectReference Include="..\Source\WPF.Appsettings.csproj" />
 	</ItemGroup>
 
 </Project>
