@@ -5,23 +5,34 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using WpfApp1.Core;
+using WPF.Appsettings.Sandbox.Core;
 
 namespace WPF.Appsettings.Sandbox;
 
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+///     Interaction logic for MainWindow.xaml
 /// </summary>
-public partial class MainWindow : Window, INotifyPropertyChanged
+internal sealed partial class MainWindow : INotifyPropertyChanged
 {
+    private string _text = "haha";
+
     public MainWindow()
     {
         InitializeComponent();
         DataContext = this;
         IncrementCounterCommand = new RelayCommand<int>(IncrementCounter);
     }
+
     /// <summary> </summary>
     public ICommand IncrementCounterCommand { get; }
+
+    public string Text
+    {
+        get => _text;
+        private set => SetField(ref _text, value);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
@@ -30,7 +41,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         TextBlock.Text += TextBlock.Text;
     }
 
-    private string _text = "haha";
     /// <summary> </summary>
     private void IncrementCounter(int parameter)
     {
@@ -38,24 +48,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Text += parameter.ToString();
     }
 
-    public string Text
-    {
-        get => _text;
-        set => SetField(ref _text, value);
-    }
-    
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    private void SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        if (EqualityComparer<T>.Default.Equals(field, value)) return;
         field = value;
         OnPropertyChanged(propertyName);
-        return true;
     }
 }

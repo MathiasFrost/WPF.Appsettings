@@ -5,14 +5,19 @@
 		<TargetFramework>net7.0-windows</TargetFramework>
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
+
+		<Platforms>x64</Platforms>
+		<Configurations>Debug;Release</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="appsettings*.json" />
+		<EmbeddedResource Include="appsettings.json" />
+		<EmbeddedResource Include="appsettings.Development.json" Condition="'$(WPF_ENVIRONMENT)' == 'Development'" />
+		<EmbeddedResource Include="appsettings.secrets.json" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\WPF.Appsettings\WPF.Appsettings.csproj" />
+		<ProjectReference Include="..\WPF.Appsettings\WPF.Appsettings.csproj" />
 	</ItemGroup>
 
 </Project>

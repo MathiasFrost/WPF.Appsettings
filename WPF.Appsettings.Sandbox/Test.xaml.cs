@@ -1,8 +1,6 @@
-﻿using System.Windows.Controls;
+﻿namespace WPF.Appsettings.Sandbox;
 
-namespace WPF.Appsettings.Sandbox;
-
-public partial class Test : UserControl
+internal sealed partial class Test
 {
     public Test()
     {

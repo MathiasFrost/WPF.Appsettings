@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Input;
 
-namespace WpfApp1.Core;
+namespace WPF.Appsettings.Sandbox.Core;
 
 /// <inheritdoc/>
 public sealed class RelayCommand<T> : ICommand

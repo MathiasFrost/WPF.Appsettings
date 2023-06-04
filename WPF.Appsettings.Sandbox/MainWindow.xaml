@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPF.Appsettings.Sandbox"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" x:ClassModifier="internal">
 	<Grid>
 		<StackPanel>
 			<TextBlock FontSize="26" x:Name="TextBlock">Hi</TextBlock>
 			<Button Click="ButtonBase_OnClick">Test</Button>
 			<TextBlock FontSize="26" Text="{Binding Text}"><!--<Binding Path="Name"></Binding>--></TextBlock>
 			<Button CommandParameter="2" Command="{Binding IncrementCounterCommand}">Test</Button>
-			<local:Test></local:Test>
+			<local:Test />
 		</StackPanel>
 	</Grid>
 </Window>

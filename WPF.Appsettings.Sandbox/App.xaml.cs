@@ -1,22 +1,36 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Windows;
+using Microsoft.Extensions.Configuration;
 
 namespace WPF.Appsettings.Sandbox;
 
 /// <summary>
-/// Interaction logic for App.xaml
+///     Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application
+public sealed partial class App
 {
-    protected override void OnActivated(EventArgs e)
+    private static IConfiguration Configuration { get; } = new ConfigurationBuilder().AddAppsettings().Build();
+
+    protected override void OnStartup(StartupEventArgs e)
     {
-        base.OnActivated(e);
-        foreach (var (key, value) in Appsettings.Value)
-        {
-            Debug.WriteLine($"{key} {value}");  
-        }   
-        Debug.WriteLine(Appsettings.GetSection("Logging__LogLevel__Default").GetString());
+        base.OnStartup(e);
+        Debug.WriteLine(Configuration["Logging:LogLevel:Default"]);
+        Debug.WriteLine(Configuration["ExternalAPI:Fitness.API:APIKey"]);
+        Debug.WriteLine(JsonSerializer.Serialize(Configuration.GetSection("Logging").Get<Logging>()));
+    }
+
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global"), SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public sealed class Logging
+    {
+        public LogLevel LogLevel { get; init; } = new();
+    }
+
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global"), SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public sealed class LogLevel
+    {
+        public string Default { get; init; } = String.Empty;
     }
 }
